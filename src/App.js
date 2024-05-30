@@ -1,25 +1,37 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useDebugValue, useEffect, useState } from 'react'
+import { supabase } from './helper/supabaseClient'
 
-function App() {
+export default function App() {
+
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    const session = supabase.auth.getSession();
+    setUser(session?.user)
+  }, [])
+  
+  // find out why user not passing auth (possible: state issues or smth)
+  const login = async() => {
+    await supabase.auth.signInWithOAuth({
+      provider: "github",
+    });
+  };
+
+  const logout = async() => {
+    await supabase.auth.signOut();
+  };
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      {user ? (
+        <div>
+      <h1>Authenticated</h1>
+      <button onClick={logout}>Logout</button>
+      </div>
+    ):(
+      <button onClick={login}>Login with GitHub</button> //this nigga just not working
+      )}
+      
     </div>
-  );
+  )
 }
-
-export default App;
